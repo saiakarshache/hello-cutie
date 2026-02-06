@@ -8,12 +8,13 @@ const views = {
 
 const yesBtn = document.getElementById("yesBtn");
 const noBtn  = document.getElementById("noBtn");
+const restartBtn = document.getElementById("restartBtn");
 
 const fxLayer = document.getElementById("fxLayer");
 const yesImg  = document.querySelector(".yes-img");
 
 // =============================
-// View system (prevents flash)
+// View system
 // =============================
 function setActive(viewEl){
   Object.values(views).forEach(v => v?.classList.remove("is-active"));
@@ -48,14 +49,14 @@ function spawnFloatHeartAt(x, y){
 }
 
 // =============================
-// FX: heart shower (smooth + capped DOM)
+// FX: heart shower (capped for mobile)
 // =============================
-function startHeartShower(durationMs = 2500){
+function startHeartShower(durationMs = 2200){
   if(!fxLayer) return;
 
   const start = performance.now();
-  const spawnEveryMs = 70;
-  const maxOnScreen = 120;
+  const spawnEveryMs = 110;   // smoother on mobile
+  const maxOnScreen = 60;     // cap DOM nodes
   let lastSpawn = 0;
 
   function spawnOne(){
@@ -66,12 +67,11 @@ function startHeartShower(durationMs = 2500){
     d.textContent = "❤";
 
     const left = Math.random() * window.innerWidth;
-    const size = 16 + Math.random() * 18;
-    const fallMs = 2600 + Math.random() * 1900;
+    const size = 16 + Math.random() * 16;
+    const fallMs = 2400 + Math.random() * 1600;
 
-    // drift + rotation as CSS vars
-    const drift = (Math.random() - 0.5) * 120;
-    const rot = (Math.random() * 240 - 120);
+    const drift = (Math.random() - 0.5) * 100;
+    const rot = (Math.random() * 220 - 110);
 
     d.style.left = `${left}px`;
     d.style.fontSize = `${size}px`;
@@ -84,12 +84,11 @@ function startHeartShower(durationMs = 2500){
   }
 
   function loop(t){
-    const elapsed = t - start;
-    if(elapsed >= durationMs) return;
+    if(t - start >= durationMs) return;
 
     if(t - lastSpawn >= spawnEveryMs){
       spawnOne();
-      if(Math.random() > 0.6) spawnOne();
+      if(Math.random() > 0.65) spawnOne();
       lastSpawn = t;
     }
     requestAnimationFrame(loop);
@@ -99,14 +98,12 @@ function startHeartShower(durationMs = 2500){
 }
 
 // =============================
-// Balloon mechanic (5 clicks)
+// Balloon mechanic
 // =============================
 let noClicks = 0;
 let yesScale = 1;
 let noScale  = 1;
 
-// 5 clicks to pop:
-// yesScale = 1 + (5 * 0.12) = 1.60
 const YES_GROW_STEP  = 0.20;
 const NO_SHRINK_STEP = 0.09;
 const YES_MAX        = 1.55;
@@ -134,10 +131,8 @@ function resetBalloon(){
 function popYesBalloon(){
   if(!yesBtn) return;
 
-  // hearts immediately
-  startHeartShower(5000);
+  startHeartShower(2200);
 
-  // pop anim
   yesBtn.animate(
     [
       { transform: `scale(${yesScale})` },
@@ -148,22 +143,18 @@ function popYesBalloon(){
     { duration: 700, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
   );
 
-  // switch view cleanly
   setTimeout(() => {
     setActive(views.yes);
     resetBalloon();
-  }, 360);
+  }, 320);
 }
 
 function onNo(){
   if(!noBtn) return;
 
   const r = noBtn.getBoundingClientRect();
-
-  // big heart above NO
   spawnFloatHeartAt(r.left + r.width/2, r.top - 10);
 
-  // wobble
   noBtn.animate(
     [
       { transform: `scale(${noScale}) translate3d(0,0,0)` },
@@ -186,7 +177,20 @@ function onNo(){
 }
 
 // =============================
-// Preload YES image (fixes “lag”)
+// Navigation
+// =============================
+function goAsk(){
+  setActive(views.ask);
+  resetBalloon();
+}
+
+function goYes(){
+  startHeartShower(1600);
+  setTimeout(() => setActive(views.yes), 120);
+}
+
+// =============================
+// Preload YES image
 // =============================
 async function preloadYesImage(){
   if(!yesImg?.src) return;
@@ -196,33 +200,15 @@ async function preloadYesImage(){
 }
 
 // =============================
-// Navigation
+// Mobile fast-tap binding (fixes laggy taps)
 // =============================
-function goAsk(){
-  setActive(views.ask);
-  resetBalloon();
+function bindFastTap(el, handler){
+  if(!el) return;
+  el.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    handler(e);
+  }, { passive: false });
 }
-function goYes(){
-  startHeartShower(2200);
-  setTimeout(() => setActive(views.yes), 120);
-}
-
-// =============================
-// Events
-// =============================
-yesBtn?.addEventListener("click", goYes);
-
-noBtn?.addEventListener("click", (e) => {
-  e.preventDefault();
-  onNo();
-});
-
-noBtn?.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  onNo();
-}, { passive:false });
-
-document.getElementById("restartBtn")?.addEventListener("click", goAsk);
 
 // =============================
 // Init
@@ -230,4 +216,8 @@ document.getElementById("restartBtn")?.addEventListener("click", goAsk);
 (async function init(){
   await preloadYesImage();
   setActive(views.ask);
+
+  bindFastTap(yesBtn, goYes);
+  bindFastTap(noBtn, onNo);
+  bindFastTap(restartBtn, goAsk);
 })();

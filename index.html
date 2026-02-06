@@ -4,16 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>D-One Athlete</title>
+
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
-
 </head>
 
 <body>
 <!-- Background -->
-<div class="bg">
+<div class="bg" aria-hidden="true">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <div class="blob b3"></div>
@@ -45,24 +45,22 @@
                 <feGaussianBlur stdDeviation="10" result="blur"/>
                 <feColorMatrix in="blur" type="matrix"
                                values="1 0 0 0 0
-                    0 1 0 0 0
-                    0 0 1 0 0
-                    0 0 0 0.95 0" />
+                                 0 1 0 0 0
+                                 0 0 1 0 0
+                                 0 0 0 0.95 0" />
             </filter>
         </defs>
 
-        <!-- soft glow base -->
         <path filter="url(#blurGlow)" fill="url(#g2)"
               d="M256 464s-30.6-18.4-61.7-40.8C133 387.4 64 333.2 64 240
-           64 168.6 118.6 112 190 112c34.6 0 63.6 15.7 80.9 38.5
-           C288.4 127.7 317.4 112 352 112c71.4 0 126 56.6 126 128
-           0 93.2-69 147.4-130.3 183.2C286.6 445.6 256 464 256 464z"/>
-        <!-- highlight -->
+               64 168.6 118.6 112 190 112c34.6 0 63.6 15.7 80.9 38.5
+               C288.4 127.7 317.4 112 352 112c71.4 0 126 56.6 126 128
+               0 93.2-69 147.4-130.3 183.2C286.6 445.6 256 464 256 464z"/>
         <path fill="url(#g1)" opacity="0.9"
               d="M256 464s-30.6-18.4-61.7-40.8C133 387.4 64 333.2 64 240
-           64 168.6 118.6 112 190 112c34.6 0 63.6 15.7 80.9 38.5
-           C288.4 127.7 317.4 112 352 112c71.4 0 126 56.6 126 128
-           0 93.2-69 147.4-130.3 183.2C286.6 445.6 256 464 256 464z"/>
+               64 168.6 118.6 112 190 112c34.6 0 63.6 15.7 80.9 38.5
+               C288.4 127.7 317.4 112 352 112c71.4 0 126 56.6 126 128
+               0 93.2-69 147.4-130.3 183.2C286.6 445.6 256 464 256 464z"/>
     </svg>
 
     <!-- ASK VIEW -->
@@ -92,7 +90,6 @@
             <div class="yes-bubble">
                 <p class="yes-title">Thank you, means a lot <span class="soft-heart">♡</span></p>
             </div>
-
         </div>
     </section>
 </main>
